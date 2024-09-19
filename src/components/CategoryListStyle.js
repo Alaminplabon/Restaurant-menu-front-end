@@ -31,12 +31,10 @@ export const StyledListItem = styled(ListItem)(({ theme }) => ({
   backgroundColor: theme.palette.primary.light, // Light primary background color
   borderRadius: theme.shape.borderRadius,
   boxShadow: theme.shadows[2],
-  width: '120px', // Fixed width to ensure uniform size
-  height: '50px', // Fixed height for consistency
-  color: theme.palette.primary.contrastText, // Text color for contrast
-  // whiteSpace: 'nowrap', // Prevents text from wrapping to new lines
-  // overflow: 'hidden', // Ensures the content stays within bounds
-  textOverflow: 'ellipsis', // Adds ellipsis (...) if the text is too long
+  width: '120px', 
+  height: '50px', 
+  color: theme.palette.primary.contrastText, 
+  textOverflow: 'ellipsis',
   '&:hover': {
     backgroundColor: theme.palette.primary.main, // Darker background on hover
     cursor: 'pointer',
