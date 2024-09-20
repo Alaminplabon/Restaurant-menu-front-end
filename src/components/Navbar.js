@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import {
   AppBar,
@@ -11,6 +11,9 @@ import {
   MenuItem,
   Menu,
   Button,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -19,7 +22,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
-// import CartIcon from '../images/CartIcon.png';
+import { dummyData } from './dummy_data/data';// Import your dummy data
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -63,6 +66,33 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token); // Set to true if token exists
+  }, []);
+
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    setInputValue(value);
+
+    if (value) {
+      const filteredSuggestions = dummyData.filter(item =>
+        item.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setInputValue(suggestion.name);
+    setSuggestions([]);
+  };
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -86,7 +116,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/';
+    setIsLoggedIn(false); // Update logged-in state
+    window.location.href = '/'; // Redirect to home page
   };
 
   const menuId = 'primary-search-account-menu';
@@ -102,7 +133,7 @@ const Navbar = () => {
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      {isLoggedIn && <MenuItem onClick={handleLogout}>Logout</MenuItem>}
     </Menu>
   );
 
@@ -171,14 +202,26 @@ const Navbar = () => {
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
+              value={inputValue}
+              onChange={handleInputChange}
               inputProps={{ 'aria-label': 'search' }}
             />
+            {suggestions.length > 0 && (
+              <List sx={{ position: 'absolute', zIndex: 1, bgcolor: 'black', maxHeight: '200px', overflowY: 'auto' }}>
+                {suggestions.map((suggestion) => (
+                  <ListItem button key={suggestion.id} onClick={() => handleSuggestionClick(suggestion)}>
+                    <ListItemText primary={suggestion.name} />
+                  </ListItem>
+                ))}
+              </List>
+            )}
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Button color="inherit" component={Link} to="/">Home</Button>
             <Button color="inherit" component={Link} to="/admin">Admin</Button>
-            <Button color="inherit" component={Link} to="/login">Login</Button>
+            {!isLoggedIn && <Button color="inherit" component={Link} to="/login">Login</Button>}
+            {!isLoggedIn && <Button color="inherit" component={Link} to="/signup">Sign up</Button>}
             <IconButton
               size="large"
               aria-label="show 4 new mails"
@@ -224,7 +267,7 @@ const Navbar = () => {
         </Toolbar>
       </AppBar>
       {renderMobileMenu}
-      {renderMenu}
+      {renderMenu} {/* Ensure this line is correctly closed */}
     </Box>
   );
 };

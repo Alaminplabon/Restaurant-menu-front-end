@@ -16,6 +16,7 @@ API.interceptors.request.use(config => {
 
 // Authentication
 export const login = (data) => API.post('/login', data);
+export const signup = (data) => API.post('/signup', data);
 
 export const fetchCategories = () => API.get('/categories');
 export const createCategory = (data) => API.post('/categories', data);
